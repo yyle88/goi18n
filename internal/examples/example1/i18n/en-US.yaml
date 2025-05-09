@@ -1,0 +1,8 @@
+SAY_HELLO: "Hello, {{ .name }}!"
+WELCOME: "Welcome to this app!"
+NEW_MESSAGES: "Hi, {{ .name }}! You have {{ .count }} new messages."
+SUCCESS: "Success"
+ERROR_BAD_PARAM: "Invalid parameter: {{ .name }}"
+ERROR_ALREADY_EXIST: "{{ .what }} {{ .code }} already exists"
+ERROR_NOT_EXIST: "{{ .what }} {{ .code }} does not exist"
+PLEASE_CONFIRM: "Please confirm to {{ . }}"

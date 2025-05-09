@@ -1,0 +1,8 @@
+SAY_HELLO: "សួស្តី {{ .name }}!"
+WELCOME: "សូមស្វាគមន៍មកកាន់កម្មវិធីនេះ!"
+NEW_MESSAGES: "សួស្តី {{ .name }}! អ្នកមានសារថ្មី {{ .count }} ។"
+SUCCESS: "ជោគជ័យ"
+ERROR_BAD_PARAM: "ប៉ារ៉ាម៉ែត្រមិនត្រឹមត្រូវ៖ {{ .name }}"
+ERROR_ALREADY_EXIST: "{{ .what }} {{ .code }} មានរួចហើយ"
+ERROR_NOT_EXIST: "{{ .what }} {{ .code }} មិនមានទេ"
+PLEASE_CONFIRM: "សូមបញ្ជាក់ដើម្បី {{ . }}"

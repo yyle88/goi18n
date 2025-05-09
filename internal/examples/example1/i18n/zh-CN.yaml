@@ -1,0 +1,8 @@
+SAY_HELLO: "你好，{{.name}}！"
+WELCOME: "欢迎使用此应用！"
+NEW_MESSAGES: "嗨，{{.name}}！您有 {{.count}} 条新消息。"
+SUCCESS: "成功"
+ERROR_BAD_PARAM: "无效参数：{{.name}}"
+ERROR_ALREADY_EXIST: "{{.what}} {{.code}} 已存在"
+ERROR_NOT_EXIST: "{{.what}} {{.code}} 不存在"
+PLEASE_CONFIRM: "请确认{{.}}"

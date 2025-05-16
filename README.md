@@ -80,7 +80,7 @@ func main() {
         panic(err)
     }
 
-    options := goi18n.NewOptions("output/generated.go")
+    options := goi18n.NewOptions().WithOutputPathWithPkgName("output/generated.go")
     goi18n.Generate([]*i18n.MessageFile{messageFile}, options)
 }
 ```

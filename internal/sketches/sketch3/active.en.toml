@@ -1,0 +1,5 @@
+[Cats]
+zero = "I have no cats"
+one = "I have one cat."
+two = "I have two cats."
+other = "I have {{.count}} cats."

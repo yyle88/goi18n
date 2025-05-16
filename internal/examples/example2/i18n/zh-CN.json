@@ -1,0 +1,14 @@
+{
+  "OPEN_ISSUES": {
+    "other": "项目中有 {{.count}} 个未解决问题。"
+  },
+  "COMPLETED_TASKS": {
+    "other": "项目中完成了 {{.count}} 个任务。"
+  },
+  "PENDING_REVIEWS": {
+    "other": "项目中有 {{.count}} 个待审。"
+  },
+  "ACTIVE_USERS": {
+    "other": "项目中有 {{.count}} 个活跃用户。"
+  }
+}

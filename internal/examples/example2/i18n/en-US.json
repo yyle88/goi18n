@@ -1,0 +1,18 @@
+{
+  "OPEN_ISSUES": {
+    "one": "There is one open issue in the project.",
+    "other": "There are {{.count}} open issues in the project."
+  },
+  "COMPLETED_TASKS": {
+    "one": "One task is completed in the project.",
+    "other": "{{.count}} tasks are completed in the project."
+  },
+  "PENDING_REVIEWS": {
+    "one": "There is one pending review in the project.",
+    "other": "There are {{.count}} pending reviews in the project."
+  },
+  "ACTIVE_USERS": {
+    "one": "One user is active in the project.",
+    "other": "{{.count}} users are active in the project."
+  }
+}

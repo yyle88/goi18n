@@ -3,19 +3,20 @@ module github.com/yyle88/goi18n
 go 1.22.8
 
 require (
+	github.com/BurntSushi/toml v1.5.0
 	github.com/emirpasic/gods/v2 v2.0.0-alpha
 	github.com/iancoleman/strcase v0.3.0
 	github.com/nicksnyder/go-i18n/v2 v2.5.1
 	github.com/stretchr/testify v1.10.0
 	github.com/yyle88/formatgo v1.0.24
-	github.com/yyle88/must v0.0.22
+	github.com/yyle88/must v0.0.23
 	github.com/yyle88/neatjson v0.0.12
 	github.com/yyle88/osexistpath v0.0.17
 	github.com/yyle88/printgo v1.0.5
 	github.com/yyle88/rese v0.0.10
 	github.com/yyle88/runpath v1.0.23
 	github.com/yyle88/sortslice v1.0.7
-	github.com/yyle88/syntaxgo v0.0.48
+	github.com/yyle88/syntaxgo v0.0.50
 	github.com/yyle88/zaplog v0.0.22
 	go.uber.org/zap v1.27.0
 	golang.org/x/text v0.21.0

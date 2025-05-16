@@ -2,9 +2,7 @@ package goi18n
 
 import (
 	"os"
-	"path/filepath"
 	"regexp"
-	"strings"
 
 	"github.com/emirpasic/gods/v2/maps/linkedhashmap"
 	"github.com/emirpasic/gods/v2/sets/linkedhashset"
@@ -14,72 +12,42 @@ import (
 	"github.com/yyle88/must"
 	"github.com/yyle88/must/mustslice"
 	"github.com/yyle88/neatjson/neatjsons"
+	"github.com/yyle88/osexistpath/osmustexist"
 	"github.com/yyle88/printgo"
+	"github.com/yyle88/rese"
 	"github.com/yyle88/sortslice"
 	"github.com/yyle88/syntaxgo/syntaxgo_ast"
 	"github.com/yyle88/zaplog"
 	"go.uber.org/zap"
 )
 
-type Options struct {
-	OutputPath string
-	PkgName    string
-}
+func Generate(messageFiles []*i18n.MessageFile, options *Options) {
+	mapParams := ParseParamNames(messageFiles)
+	zaplog.SUG.Debugln(neatjsons.S(mapParams))
 
-func NewOptions(outputPath string) *Options {
-	must.Same(filepath.Ext(outputPath), ".go")
-
-	pkgName := filepath.Base(filepath.Dir(outputPath))
-	pkgName = strcase.ToSnake(pkgName)
-	pkgName = strings.ReplaceAll(pkgName, "_", "")
-	pkgName = strings.ToLower(pkgName)
-
-	return &Options{
-		OutputPath: outputPath,
-		PkgName:    pkgName,
-	}
-}
-
-func Generate(messageFiles []*i18n.MessageFile, options *Options) map[string]*Param {
-	res := ParseParamNames(messageFiles)
-	zaplog.SUG.Debugln(neatjsons.S(res))
-
-	messageParams := SortMessageParams(res)
+	messageParams := SortMessageParams(mapParams)
 	zaplog.SUG.Debugln(neatjsons.S(messageParams))
 
 	contentBytes := CreateMessageFunctions(messageParams)
 	zaplog.SUG.Debugln(string(contentBytes))
 
-	ptx := printgo.NewPTX()
-	ptx.Println("package", must.Nice(options.PkgName))
-	ptx.Println()
-	ptx.Write(contentBytes)
-	ptx.Println()
-
-	contentBytes = ptx.Bytes()
-	zaplog.SUG.Debugln(string(contentBytes))
-
-	//把要引用的包写到代码的 import 里面（这样能提高format的速度，否则 format 还得找包，就会很慢，而且也未必能找到引用，因此这里主动设置引用）
-	importOptions := syntaxgo_ast.NewPackageImportOptions().SetInferredObject(i18n.Message{})
-	contentBytes = importOptions.InjectImports(contentBytes)
-
-	//调整代码格式和风格。注意：这里即使出错也能返回原来的代码，而且内部已有 warn 级别的日志，因此直接忽略错误
-	contentBytes, _ = formatgo.FormatBytes(contentBytes)
-	must.Have(contentBytes)
-
-	must.Done(os.WriteFile(must.Nice(options.OutputPath), contentBytes, 0666))
-	return res
+	if options.OutputPath != "" && options.PkgName != "" {
+		WriteContentToCodeFile(contentBytes, options)
+	} else {
+		zaplog.SUG.Debugln("NOT write-content-to-code-file RETURN")
+	}
 }
 
 type Param struct {
 	Names           *linkedhashset.Set[string]
 	HasOneAnonymous bool
+	NeedPluralCount bool
 }
 
 func ParseParamNames(messageFiles []*i18n.MessageFile) map[string]*Param {
 	res := map[string]*Param{}
 
-	regExp := regexp.MustCompile(`\{\{\s*\.(\w*)\s*}}`)
+	regexpRegexp := regexp.MustCompile(`\{\{\s*\.(\w*)\s*}}`)
 	for _, messageFile := range messageFiles {
 		for _, message := range messageFile.Messages {
 			param, ok := res[message.ID]
@@ -90,15 +58,17 @@ func ParseParamNames(messageFiles []*i18n.MessageFile) map[string]*Param {
 				res[message.ID] = param
 			}
 
-			for _, msgTemplate := range []string{
+			messageTemplates := []string{
 				message.Other, //优先使用这个字段，因为我比较懒惰通常只配置默认的翻译，而不会精细化的使用单复数
 				message.One,
 				message.Zero,
 				message.Two,
 				message.Few,
 				message.Many,
-			} {
-				names := parseParamNames(msgTemplate, regExp)
+			}
+
+			for _, msgTemplate := range messageTemplates {
+				names := parseParamNames(msgTemplate, regexpRegexp)
 				for _, name := range names {
 					if name == "" {
 						mustslice.Length(names, 1)     //匿名参数只能出现一次，而且不能再有其它参数
@@ -110,15 +80,25 @@ func ParseParamNames(messageFiles []*i18n.MessageFile) map[string]*Param {
 					}
 				}
 			}
+
+			var count = 0
+			for _, msgTemplate := range messageTemplates {
+				if msgTemplate != "" {
+					count++
+				}
+			}
+			if count >= 2 {
+				param.NeedPluralCount = true
+			}
 		}
 	}
 	return res
 }
 
-func parseParamNames(msg string, regExp *regexp.Regexp) []string {
+func parseParamNames(msg string, regexpRegexp *regexp.Regexp) []string {
 	var results = make([]string, 0)
 	if msg != "" {
-		subs := regExp.FindAllStringSubmatch(msg, -1)
+		subs := regexpRegexp.FindAllStringSubmatch(msg, -1)
 		zaplog.LOG.Debug("parse-param-names", zap.String("msg", msg), zap.Any("subs", subs))
 		for _, sub := range subs {
 			mustslice.Length(sub, 2)
@@ -221,4 +201,31 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam) {
 		ptx.Println("\t}")
 		ptx.Println("}")
 	}
+}
+
+func WriteContentToCodeFile(contentBytes []byte, options *Options) {
+	ptx := printgo.NewPTX()
+	ptx.Println("package", must.Nice(options.PkgName))
+	ptx.Println()
+	ptx.Write(contentBytes)
+	ptx.Println()
+
+	contentBytes = ptx.Bytes()
+	zaplog.SUG.Debugln(string(contentBytes))
+
+	//把要引用的包写到代码的 import 里面（这样能提高format的速度，否则 format 还得找包，就会很慢，而且也未必能找到引用，因此这里主动设置引用）
+	importOptions := syntaxgo_ast.NewPackageImportOptions().SetInferredObject(i18n.Message{})
+	contentBytes = importOptions.InjectImports(contentBytes)
+
+	//调整代码格式和风格。注意：这里即使出错也能返回原来的代码，而且内部已有 warn 级别的日志，因此直接忽略错误
+	contentBytes, _ = formatgo.FormatBytes(contentBytes)
+	must.Have(contentBytes)
+
+	path := must.Nice(options.OutputPath)
+
+	var perm os.FileMode = 0666 // default file-mode-perm
+	if osmustexist.IsFile(path) {
+		perm = rese.V1(os.Stat(path)).Mode()
+	}
+	must.Done(os.WriteFile(path, contentBytes, perm))
 }

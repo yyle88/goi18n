@@ -1,39 +1,18 @@
-package example1
+package example1_test
 
 import (
 	"testing"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/stretchr/testify/require"
+	"github.com/yyle88/goi18n/internal/examples/example1"
 	"github.com/yyle88/goi18n/internal/examples/example1/example1generate/example1message"
-	"github.com/yyle88/neatjson/neatjsons"
-	"github.com/yyle88/osexistpath/osmustexist"
-	"github.com/yyle88/rese"
-	"github.com/yyle88/runpath"
-	"github.com/yyle88/zaplog"
-	"go.uber.org/zap"
-	"golang.org/x/text/language"
-	"gopkg.in/yaml.v3"
 )
 
 var caseBundle *i18n.Bundle
 
 func TestMain(m *testing.M) {
-	bundle := i18n.NewBundle(language.AmericanEnglish)
-	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-
-	for _, locale := range []string{"en-US", "zh-CN", "km-KH"} {
-		path := runpath.PARENT.Join("i18n", locale+".yaml")
-		zaplog.LOG.Debug("LOAD", zap.String("path", path))
-
-		osmustexist.MustFile(path)
-
-		messageFile := rese.P1(bundle.LoadMessageFile(path))
-		zaplog.SUG.Debugln(neatjsons.S(messageFile))
-	}
-	zaplog.SUG.Debugln(neatjsons.S(bundle.LanguageTags()))
-
-	caseBundle = bundle
+	caseBundle, _ = example1.LoadI18nFiles()
 	m.Run()
 }
 

@@ -1,6 +1,8 @@
-package example1
+package example2
 
 import (
+	"encoding/json"
+
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/yyle88/neatjson/neatjsons"
 	"github.com/yyle88/osexistpath/osmustexist"
@@ -9,16 +11,15 @@ import (
 	"github.com/yyle88/zaplog"
 	"go.uber.org/zap"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v3"
 )
 
 func LoadI18nFiles() (*i18n.Bundle, []*i18n.MessageFile) {
 	bundle := i18n.NewBundle(language.AmericanEnglish)
-	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 
 	var messageFiles []*i18n.MessageFile
-	for _, locale := range []string{"en-US", "zh-CN", "km-KH"} {
-		path := runpath.PARENT.Join("i18n", locale+".yaml")
+	for _, locale := range []string{"en-US", "zh-CN"} {
+		path := runpath.PARENT.Join("i18n", locale+".json")
 		zaplog.LOG.Debug("LOAD", zap.String("path", path))
 
 		osmustexist.MustFile(path)

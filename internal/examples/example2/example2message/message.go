@@ -1,6 +1,9 @@
 package example2message
 
-import "github.com/nicksnyder/go-i18n/v2/i18n"
+import (
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/yyle88/goi18n"
+)
 
 type ActiveUsersParam struct {
 	Count any
@@ -18,10 +21,11 @@ func NewActiveUsers(data *ActiveUsersParam) (string, map[string]any) {
 	return "ACTIVE_USERS", data.GetTemplateValues()
 }
 
-func I18nActiveUsers(data *ActiveUsersParam) *i18n.LocalizeConfig {
+func I18nActiveUsers(data *ActiveUsersParam, pluralConfig *goi18n.PluralConfig) *i18n.LocalizeConfig {
 	return &i18n.LocalizeConfig{
 		MessageID:    "ACTIVE_USERS",
 		TemplateData: data.GetTemplateValues(),
+		PluralCount:  pluralConfig.PluralCount,
 	}
 }
 
@@ -41,10 +45,11 @@ func NewCompletedTasks(data *CompletedTasksParam) (string, map[string]any) {
 	return "COMPLETED_TASKS", data.GetTemplateValues()
 }
 
-func I18nCompletedTasks(data *CompletedTasksParam) *i18n.LocalizeConfig {
+func I18nCompletedTasks(data *CompletedTasksParam, pluralConfig *goi18n.PluralConfig) *i18n.LocalizeConfig {
 	return &i18n.LocalizeConfig{
 		MessageID:    "COMPLETED_TASKS",
 		TemplateData: data.GetTemplateValues(),
+		PluralCount:  pluralConfig.PluralCount,
 	}
 }
 
@@ -64,32 +69,22 @@ func NewOpenIssues(data *OpenIssuesParam) (string, map[string]any) {
 	return "OPEN_ISSUES", data.GetTemplateValues()
 }
 
-func I18nOpenIssues(data *OpenIssuesParam) *i18n.LocalizeConfig {
+func I18nOpenIssues(data *OpenIssuesParam, pluralConfig *goi18n.PluralConfig) *i18n.LocalizeConfig {
 	return &i18n.LocalizeConfig{
 		MessageID:    "OPEN_ISSUES",
 		TemplateData: data.GetTemplateValues(),
+		PluralCount:  pluralConfig.PluralCount,
 	}
 }
 
-type PendingReviewsParam struct {
-	Count any
+func NewPendingReviews[Value comparable](value Value) (string, Value) {
+	return "PENDING_REVIEWS", value
 }
 
-func (p *PendingReviewsParam) GetTemplateValues() map[string]any {
-	res := make(map[string]any)
-	if p.Count != nil {
-		res["count"] = p.Count
-	}
-	return res
-}
-
-func NewPendingReviews(data *PendingReviewsParam) (string, map[string]any) {
-	return "PENDING_REVIEWS", data.GetTemplateValues()
-}
-
-func I18nPendingReviews(data *PendingReviewsParam) *i18n.LocalizeConfig {
+func I18nPendingReviews[Value comparable](value Value, pluralConfig *goi18n.PluralConfig) *i18n.LocalizeConfig {
 	return &i18n.LocalizeConfig{
 		MessageID:    "PENDING_REVIEWS",
-		TemplateData: data.GetTemplateValues(),
+		TemplateData: value,
+		PluralCount:  pluralConfig.PluralCount,
 	}
 }

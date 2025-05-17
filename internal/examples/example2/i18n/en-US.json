@@ -9,7 +9,7 @@
   },
   "PENDING_REVIEWS": {
     "one": "There is one pending review in the project.",
-    "other": "There are {{.count}} pending reviews in the project."
+    "other": "There are {{.}} pending reviews in the project."
   },
   "ACTIVE_USERS": {
     "one": "One user is active in the project.",

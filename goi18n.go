@@ -146,10 +146,17 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam) {
 		ptx.Println("}")
 		ptx.Println()
 
-		ptx.Println("func I18n"+messageName+"[Value comparable](value Value)", "*i18n.LocalizeConfig {")
+		ptx.Print("func I18n" + messageName + "[Value comparable](value Value,")
+		if messageParam.Param.NeedPluralCount {
+			ptx.Print("pluralConfig *goi18n.PluralConfig,")
+		}
+		ptx.Println(")", "*i18n.LocalizeConfig {")
 		ptx.Println("\treturn &i18n.LocalizeConfig{")
 		ptx.Println("\t\tMessageID:", `"`+messageParam.MessageID+`"`, ",")
 		ptx.Println("\t\tTemplateData: value", ",")
+		if messageParam.Param.NeedPluralCount {
+			ptx.Println("\t\tPluralCount: pluralConfig.PluralCount,")
+		}
 		ptx.Println("\t}")
 		ptx.Println("}")
 	} else if !messageParam.Param.Names.Empty() {
@@ -183,10 +190,17 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam) {
 		ptx.Println("}")
 		ptx.Println()
 
-		ptx.Println("func I18n"+messageName+"(data *", structName, ")", "*i18n.LocalizeConfig {")
+		ptx.Print("func I18n"+messageName+"(data *", structName, ",")
+		if messageParam.Param.NeedPluralCount {
+			ptx.Print("pluralConfig *goi18n.PluralConfig,")
+		}
+		ptx.Println(")", "*i18n.LocalizeConfig {")
 		ptx.Println("\treturn &i18n.LocalizeConfig{")
 		ptx.Println("\t\tMessageID:", `"`+messageParam.MessageID+`"`, ",")
 		ptx.Println("\t\tTemplateData:", "data.", methodName, "()", ",")
+		if messageParam.Param.NeedPluralCount {
+			ptx.Println("\t\tPluralCount: pluralConfig.PluralCount,")
+		}
 		ptx.Println("\t}")
 		ptx.Println("}")
 	} else {
@@ -195,9 +209,16 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam) {
 		ptx.Println("}")
 		ptx.Println()
 
-		ptx.Println("func I18n"+messageName+"()", "*i18n.LocalizeConfig {")
+		ptx.Print("func I18n" + messageName + "(")
+		if messageParam.Param.NeedPluralCount {
+			ptx.Print("pluralConfig *goi18n.PluralConfig,")
+		}
+		ptx.Println(")", "*i18n.LocalizeConfig {")
 		ptx.Println("\treturn &i18n.LocalizeConfig{")
 		ptx.Println("\t\tMessageID:", `"`+messageParam.MessageID+`"`, ",")
+		if messageParam.Param.NeedPluralCount {
+			ptx.Println("\t\tPluralCount: pluralConfig.PluralCount,")
+		}
 		ptx.Println("\t}")
 		ptx.Println("}")
 	}
@@ -214,7 +235,9 @@ func WriteContentToCodeFile(contentBytes []byte, options *Options) {
 	zaplog.SUG.Debugln(string(contentBytes))
 
 	//把要引用的包写到代码的 import 里面（这样能提高format的速度，否则 format 还得找包，就会很慢，而且也未必能找到引用，因此这里主动设置引用）
-	importOptions := syntaxgo_ast.NewPackageImportOptions().SetInferredObject(i18n.Message{})
+	importOptions := syntaxgo_ast.NewPackageImportOptions()
+	importOptions.SetInferredObject(&i18n.Message{})
+	importOptions.SetInferredObject(&MessageParam{})
 	contentBytes = importOptions.InjectImports(contentBytes)
 
 	//调整代码格式和风格。注意：这里即使出错也能返回原来的代码，而且内部已有 warn 级别的日志，因此直接忽略错误

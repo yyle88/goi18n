@@ -1,6 +1,8 @@
 package example1message
 
-import "github.com/nicksnyder/go-i18n/v2/i18n"
+import (
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+)
 
 type ErrorAlreadyExistParam struct {
 	What any

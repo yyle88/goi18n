@@ -6,14 +6,13 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/stretchr/testify/require"
 	"github.com/yyle88/goi18n"
-	"github.com/yyle88/goi18n/internal/examples/example2"
 	"github.com/yyle88/goi18n/internal/examples/example2/example2message"
 )
 
 var caseBundle *i18n.Bundle
 
 func TestMain(m *testing.M) {
-	caseBundle, _ = example2.LoadI18nFiles()
+	caseBundle, _ = example2message.LoadI18nFiles()
 	m.Run()
 }
 

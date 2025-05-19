@@ -127,15 +127,22 @@ goi18n/
 ├── goi18n.go         # 核心逻辑
 ├── internal/
 │   └── examples/
-│       └── example1/ # 示例和测试代码
-│           ├── example1_test.go
-│           └── i18n/
-│               ├── en-US.yaml
-│               ├── zh-CN.yaml
-│               └── km-KH.yaml
+│       ├── example1/ # 展示如何读取 yaml 配置获取翻译信息
+│       │   ├── example1_test.go
+│       │   └── i18n/
+│       │       ├── en-US.yaml
+│       │       ├── zh-CN.yaml
+│       │       └── km-KH.yaml
+│       └── example2/ # 展示如何读取 json 配置获取翻译信息
+│           ├── example2_test.go
+│           └── example2message/
+│               ├── trans.en-US.json
+│               └── trans.zh-CN.json
 ```
 
-查看[生成逻辑](internal/examples/example1/example1generate/generate_test.go)。查看[使用示例](internal/examples/example1/example1_test.go)。
+查看[生成逻辑1](internal/examples/example1/example1message/i18n.gen_test.go)。查看[使用示例1](internal/examples/example1/example1_test.go)。
+
+查看[生成逻辑2](internal/examples/example2/example2message/i18n.gen_test.go)。查看[使用示例1](internal/examples/example2/example2_test.go).
 
 ## 测试
 

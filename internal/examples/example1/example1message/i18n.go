@@ -1,8 +1,6 @@
-package example2generate
+package example1message
 
 import (
-	"encoding/json"
-
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/yyle88/neatjson/neatjsons"
 	"github.com/yyle88/osexistpath/osmustexist"
@@ -11,15 +9,19 @@ import (
 	"github.com/yyle88/zaplog"
 	"go.uber.org/zap"
 	"golang.org/x/text/language"
+	"gopkg.in/yaml.v3"
 )
 
+// DefaultLanguage 配置默认语言
+var DefaultLanguage = language.AmericanEnglish
+
 func LoadI18nFiles() (*i18n.Bundle, []*i18n.MessageFile) {
-	bundle := i18n.NewBundle(language.AmericanEnglish)
-	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
+	bundle := i18n.NewBundle(DefaultLanguage)
+	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
 	var messageFiles []*i18n.MessageFile
-	for _, locale := range []string{"en-US", "zh-CN"} {
-		path := runpath.PARENT.UpTo(2, "i18n", locale+".json")
+	for _, locale := range []string{"en-US", "zh-CN", "km-KH"} {
+		path := runpath.PARENT.UpTo(1, "i18n", locale+".yaml")
 		zaplog.LOG.Debug("LOAD", zap.String("path", path))
 
 		osmustexist.MustFile(path)

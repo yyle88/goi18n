@@ -69,23 +69,21 @@ package main
 import (
     "github.com/nicksnyder/go-i18n/v2/i18n"
     "github.com/yyle88/goi18n"
-    "gopkg.in/yaml.v3"
+	"github.com/yyle88/rese"
+	"gopkg.in/yaml.v3"
 )
 
 func main() {
     bundle := i18n.NewBundle(language.AmericanEnglish)
     bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-    messageFile, err := bundle.LoadMessageFile("i18n/en-US.yaml")
-    if err != nil {
-        panic(err)
-    }
+    messageFile := rese.P1(bundle.LoadMessageFile("i18n/en-US.yaml"))
 
-    options := goi18n.NewOptions().WithOutputPathWithPkgName("output/generated.go")
+    options := goi18n.NewOptions().WithOutputPathWithPkgName("output/message.go")
     goi18n.Generate([]*i18n.MessageFile{messageFile}, options)
 }
 ```
 
-This generates a file (`output/generated.go`) with package `output`, containing structs (e.g., `ErrorAlreadyExistParam`) and functions (e.g., `NewSayHello`, `I18nSayHello`).
+This generates a file (`output/message.go`) with package `output`, containing structs (e.g., `ErrorAlreadyExistParam`) and functions (e.g., `NewSayHello`, `I18nSayHello`).
 
 ### Step 3: Use Generated Code
 
@@ -105,7 +103,7 @@ import (
 func main() {
     bundle := i18n.NewBundle(language.AmericanEnglish)
     bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-    bundle.LoadMessageFile("i18n/zh-CN.yaml")
+    bundle.MustLoadMessageFile("i18n/zh-CN.yaml")
 
     localizer := i18n.NewLocalizer(bundle, "zh-CN")
 
@@ -159,21 +157,28 @@ The project includes tests in `internal/examples/example1/example1_test.go`, cov
 - Anonymous parameters: `I18nPleaseConfirm`
 - No parameters: `I18nWelcome`, `I18nSuccess`
 
-## Contributing
-
-Contributions are welcome! To contribute:
-
-1. Fork the repo in GitHub.
-2. Create a feature branch (`git checkout -b feature/xxx`).
-3. Commit changes (`git commit -m "Add feature xxx"`).
-4. Push to the branch (`git push origin feature/xxx`).
-5. Open a pull request.
-
-Please ensure tests pass and include relevant documentation updates.
+---
 
 ## License
 
 MIT License. See [LICENSE](LICENSE).
+
+---
+
+## Contributing
+
+Contributions are welcome! To contribute:
+
+1. Fork the repo on GitHub (using the webpage interface).
+2. Clone the forked project (`git clone https://github.com/yourname/repo-name.git`).
+3. Navigate to the cloned project (`cd repo-name`)
+4. Create a feature branch (`git checkout -b feature/xxx`).
+5. Stage changes (`git add .`)
+6. Commit changes (`git commit -m "Add feature xxx"`).
+7. Push to the branch (`git push origin feature/xxx`).
+8. Open a pull request on GitHub (on the GitHub webpage).
+
+Please ensure tests pass and include relevant documentation updates.
 
 ---
 

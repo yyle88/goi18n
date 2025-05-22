@@ -17,7 +17,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestI18nActiveUsers(t *testing.T) {
-	t.Run("one-en", func(t *testing.T) {
+	t.Run("one-1-en", func(t *testing.T) {
 		localizer := i18n.NewLocalizer(caseBundle, "en-US")
 		const count = 1
 		msg, err := localizer.Localize(example2message.I18nActiveUsers(
@@ -59,7 +59,7 @@ func TestI18nActiveUsers(t *testing.T) {
 }
 
 func TestI18nCompletedTasks(t *testing.T) {
-	t.Run("one-en", func(t *testing.T) {
+	t.Run("one-1-en", func(t *testing.T) {
 		localizer := i18n.NewLocalizer(caseBundle, "en-US")
 		const count = 1
 		msg, err := localizer.Localize(example2message.I18nCompletedTasks(
@@ -101,7 +101,7 @@ func TestI18nCompletedTasks(t *testing.T) {
 }
 
 func TestI18nOpenIssues(t *testing.T) {
-	t.Run("one-en", func(t *testing.T) {
+	t.Run("one-1-en", func(t *testing.T) {
 		localizer := i18n.NewLocalizer(caseBundle, "en-US")
 		const count = 1
 		msg, err := localizer.Localize(example2message.I18nOpenIssues(
@@ -143,7 +143,7 @@ func TestI18nOpenIssues(t *testing.T) {
 }
 
 func TestI18nPendingReviews(t *testing.T) {
-	t.Run("one-en", func(t *testing.T) {
+	t.Run("one-1-en", func(t *testing.T) {
 		localizer := i18n.NewLocalizer(caseBundle, "en-US")
 		const count = 1
 		msg, err := localizer.Localize(example2message.I18nPendingReviews(

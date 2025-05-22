@@ -62,23 +62,21 @@ package main
 import (
     "github.com/nicksnyder/go-i18n/v2/i18n"
     "github.com/yyle88/goi18n"
+	"github.com/yyle88/rese"
     "gopkg.in/yaml.v3"
 )
 
 func main() {
     bundle := i18n.NewBundle(language.AmericanEnglish)
     bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-    messageFile, err := bundle.LoadMessageFile("i18n/en-US.yaml")
-    if err != nil {
-        panic(err)
-    }
+    messageFile := rese.P1(bundle.LoadMessageFile("i18n/en-US.yaml"))
 
-    options := goi18n.NewOptions().WithOutputPathWithPkgName("output/generated.go")
+    options := goi18n.NewOptions().WithOutputPathWithPkgName("output/message.go")
     goi18n.Generate([]*i18n.MessageFile{messageFile}, options)
 }
 ```
 
-这将生成一个文件（`output/generated.go`），包名为 `output`，包含结构体（如 `ErrorAlreadyExistParam`）和函数（如 `NewSayHello`、`I18nSayHello`）。
+这将生成一个文件（`output/message.go`），包名为 `output`，包含结构体（如 `ErrorAlreadyExistParam`）和函数（如 `NewSayHello`、`I18nSayHello`）。
 
 ### 步骤 3：使用生成的代码
 
@@ -98,7 +96,7 @@ import (
 func main() {
     bundle := i18n.NewBundle(language.AmericanEnglish)
     bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-    bundle.LoadMessageFile("i18n/zh-CN.yaml")
+    bundle.MustLoadMessageFile("i18n/zh-CN.yaml")
 
     localizer := i18n.NewLocalizer(bundle, "zh-CN")
 
@@ -152,21 +150,24 @@ goi18n/
 - 匿名参数：`I18nPleaseConfirm`
 - 无参数：`I18nWelcome`、`I18nSuccess`
 
-## 贡献
-
-欢迎贡献代码！贡献流程如下：
-
-1. 在 GitHub 上 Fork 仓库。
-2. 创建功能分支（`git checkout -b feature/xxx`）。
-3. 提交更改（`git commit -m "添加功能 xxx"`）。
-4. 推送分支（`git push origin feature/xxx`）。
-5. 发起 Pull Request。
-
-请确保测试通过并更新相关文档。
-
 ## 许可
 
 项目采用 MIT 许可证，详情请参阅 [LICENSE](LICENSE)。
+
+## 贡献新代码
+
+非常欢迎贡献代码！贡献流程：
+
+1. 在 GitHub 上 Fork 仓库 （通过网页界面操作）。
+2. 克隆Forked项目 (`git clone https://github.com/yourname/repo-name.git`)。
+3. 在克隆的项目里 (`cd repo-name`)
+4. 创建功能分支（`git checkout -b feature/xxx`）。
+5. 添加代码 (`git add .`)。
+6. 提交更改（`git commit -m "添加功能 xxx"`）。
+7. 推送分支（`git push origin feature/xxx`）。
+8. 发起 Pull Request （通过网页界面操作）。
+
+请确保测试通过并更新相关文档。
 
 ## 贡献与支持
 

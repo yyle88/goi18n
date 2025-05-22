@@ -5,8 +5,8 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"github.com/yyle88/must"
 	"github.com/yyle88/neatjson/neatjsons"
+	"github.com/yyle88/rese"
 	"github.com/yyle88/runpath"
 	"github.com/yyle88/zaplog"
 	"golang.org/x/text/language"
@@ -17,13 +17,11 @@ func main() {
 	bundle := i18n.NewBundle(language.English)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	{
-		messageFile, err := bundle.LoadMessageFile(runpath.PARENT.Join("active.en.toml")) // 加载英文翻译文件
-		must.Done(err)
+		messageFile := rese.P1(bundle.LoadMessageFile(runpath.PARENT.Join("active.en.toml"))) // 加载英文翻译文件
 		zaplog.SUG.Debugln(neatjsons.S(messageFile))
 	}
 	{
-		messageFile, err := bundle.LoadMessageFile(runpath.PARENT.Join("active.zh.toml")) // 加载中文翻译文件
-		must.Done(err)
+		messageFile := rese.P1(bundle.LoadMessageFile(runpath.PARENT.Join("active.zh.toml"))) // 加载中文翻译文件
 		zaplog.SUG.Debugln(neatjsons.S(messageFile))
 	}
 

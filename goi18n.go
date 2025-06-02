@@ -9,6 +9,7 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/yyle88/formatgo"
+	"github.com/yyle88/goi18n/internal/utils"
 	"github.com/yyle88/must"
 	"github.com/yyle88/must/mustslice"
 	"github.com/yyle88/neatjson/neatjsons"
@@ -17,18 +18,19 @@ import (
 	"github.com/yyle88/rese"
 	"github.com/yyle88/sortslice"
 	"github.com/yyle88/syntaxgo/syntaxgo_ast"
+	"github.com/yyle88/tern"
 	"github.com/yyle88/zaplog"
 	"go.uber.org/zap"
 )
 
 func Generate(messageFiles []*i18n.MessageFile, options *Options) {
-	mapParams := ParseParamNames(messageFiles)
+	mapParams := ParseParamNames(messageFiles, options)
 	zaplog.SUG.Debugln(neatjsons.S(mapParams))
 
 	messageParams := SortMessageParams(mapParams)
 	zaplog.SUG.Debugln(neatjsons.S(messageParams))
 
-	contentBytes := CreateMessageFunctions(messageParams)
+	contentBytes := CreateMessageFunctions(messageParams, options)
 	zaplog.SUG.Debugln(string(contentBytes))
 
 	if options.OutputPath != "" && options.PkgName != "" {
@@ -44,10 +46,21 @@ type Param struct {
 	NeedPluralCount bool
 }
 
-func ParseParamNames(messageFiles []*i18n.MessageFile) map[string]*Param {
+func ParseParamNames(messageFiles []*i18n.MessageFile, options *Options) map[string]*Param {
 	res := map[string]*Param{}
 
-	regexpRegexp := regexp.MustCompile(`\{\{\s*\.(\w*)\s*}}`)
+	regexpRegexp := tern.BFF(!options.allowNonAsciiRune, func() *regexp.Regexp {
+		// 匹配 {{ .变量名 }}，变量名由 ASCII 字母数字下划线组成，非贪婪匹配，允许两边空白。
+		// Matches {{ .variable }}, where variable contains ASCII letters, digits, or underscores; uses non-greedy matching and allows optional surrounding whitespace.
+		regexpRegexp := regexp.MustCompile(`\{\{\s*\.(\w*?)\s*}}`)
+		return regexpRegexp
+	}, func() *regexp.Regexp {
+		// 匹配 {{ .变量名 }}，变量名由任意非空白字符组成，非贪婪匹配，允许两边空白。
+		// Matches {{ .variable }}, where variable contains any non-whitespace characters; uses non-greedy matching and allows optional surrounding whitespace.
+		regexpRegexp := regexp.MustCompile(`\{\{\s*\.(\S*?)\s*}}`)
+		return regexpRegexp
+	})
+
 	for _, messageFile := range messageFiles {
 		for _, message := range messageFile.Messages {
 			param, ok := res[message.ID]
@@ -128,17 +141,23 @@ type MessageParam struct {
 	Param     *Param
 }
 
-func CreateMessageFunctions(messageParams []*MessageParam) []byte {
+func CreateMessageFunctions(messageParams []*MessageParam, options *Options) []byte {
 	ptx := printgo.NewPTX()
 	for _, messageParam := range messageParams {
-		writeNewMsgFunction(ptx, messageParam)
+		writeNewMsgFunction(ptx, messageParam, options)
 		ptx.Println()
 	}
 	return ptx.Bytes()
 }
 
-func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam) {
-	messageName := strcase.ToCamel(messageParam.MessageID)
+func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam, options *Options) {
+	var messageName string
+	if options.allowNonAsciiRune && utils.HasNonASCII(messageParam.MessageID) {
+		messageName = options.unicodeMessageName(messageParam.MessageID)
+	} else {
+		messageName = strcase.ToCamel(messageParam.MessageID)
+	}
+	must.Nice(messageName)
 
 	if messageParam.Param.HasOneAnonymous {
 		ptx.Println("func New"+messageName+"[Value comparable](value Value)", "(string, Value) {")
@@ -160,10 +179,25 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam) {
 		ptx.Println("\t}")
 		ptx.Println("}")
 	} else if !messageParam.Param.Names.Empty() {
-		structName := messageName + "Param"
+		var structName string
+		if options.allowNonAsciiRune && utils.HasNonASCII(messageParam.MessageID) {
+			structName = options.unicodeStructName(messageParam.MessageID)
+		} else {
+			structName = messageName + "Param"
+		}
+		must.Nice(structName)
+
 		fieldNames := linkedhashmap.New[string, string]()
-		for _, name := range messageParam.Param.Names.Values() {
-			fieldNames.Put(name, strcase.ToCamel(name))
+		for _, paramName := range messageParam.Param.Names.Values() {
+			var fieldName string
+			if options.allowNonAsciiRune && utils.HasNonASCII(paramName) {
+				fieldName = options.unicodeFieldName(paramName)
+			} else {
+				fieldName = strcase.ToCamel(paramName)
+			}
+			must.Nice(fieldName)
+
+			fieldNames.Put(paramName, fieldName)
 		}
 		methodName := "GetTemplateValues"
 

@@ -1,4 +1,4 @@
-package example1message
+package message1
 
 import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"

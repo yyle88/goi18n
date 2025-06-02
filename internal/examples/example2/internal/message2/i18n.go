@@ -1,4 +1,4 @@
-package example2message
+package message2
 
 import (
 	"embed"

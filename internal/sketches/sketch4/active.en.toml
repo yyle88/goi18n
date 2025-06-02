@@ -1,0 +1,9 @@
+[Cats]
+Description = "Cats"
+one = "I have one cat."
+other = "I have {{.count}} cats."
+
+["我有几只猫"]
+Description = "Cats"
+one = "I have one cat."
+other = "I have {{.猫的数量}} cats."

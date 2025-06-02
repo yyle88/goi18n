@@ -127,20 +127,28 @@ goi18n/
 │   └── examples/
 │       ├── example1/ # 展示如何读取 yaml 配置获取翻译信息
 │       │   ├── example1_test.go
-│       │   └── i18n/
-│       │       ├── en-US.yaml
-│       │       ├── zh-CN.yaml
-│       │       └── km-KH.yaml
-│       └── example2/ # 展示如何读取 json 配置获取翻译信息
-│           ├── example2_test.go
-│           └── example2message/
-│               ├── trans.en-US.json
-│               └── trans.zh-CN.json
+│       │   └── internal/
+│       │       └── message1/
+│       │           ├── en-US.yaml
+│       │           ├── zh-CN.yaml
+│       │           └── km-KH.yaml
+│       ├── example2/ # 展示如何读取 json 配置获取翻译信息
+│       │   ├── example2_test.go
+│       │   └── internal/
+│       │       └── message2/
+│       │           ├── trans.en-US.json
+│       │           └── trans.zh-CN.json
+│       └── example3/ # 展示如何使用【中文优先】的国际化配置
+│           ├── example3_test.go
+│           └── internal/
+│               └── message3/
+│                   ├── msg.en-US.yaml
+│                   └── msg.zh-CN.yaml
 ```
 
-查看[生成逻辑1](internal/examples/example1/example1message/i18n.gen_test.go)。查看[使用示例1](internal/examples/example1/example1_test.go)。
-
-查看[生成逻辑2](internal/examples/example2/example2message/i18n.gen_test.go)。查看[使用示例1](internal/examples/example2/example2_test.go).
+- See [生成逻辑1](internal/examples/example1/internal/message1/i18n.gen_test.go) and [使用示例1](internal/examples/example1/example1_test.go).
+- See [生成逻辑2](internal/examples/example2/internal/message2/i18n.gen_test.go) and [使用示例2](internal/examples/example2/example2_test.go).
+- See [生成逻辑3](internal/examples/example3/internal/message3/i18n.gen_test.go) and [使用示例3](internal/examples/example3/example3_test.go).
 
 ## 测试
 

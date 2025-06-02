@@ -129,25 +129,34 @@ func main() {
 
 ```
 goi18n/
-├── goi18n.go         # Main logic
+├── goi18n.go         # Main logic for the goi18n package
 ├── internal/
 │   └── examples/
 │       ├── example1/ # Example and test code for YAML-based internationalization
 │       │   ├── example1_test.go
-│       │   └── i18n/
-│       │       ├── en-US.yaml
-│       │       ├── zh-CN.yaml
-│       │       └── km-KH.yaml
-│       └── example2/ # Example and test code for JSON-based internationalization
-│           ├── example2_test.go
-│           └── example2message/
-│               ├── trans.en-US.json
-│               └── trans.zh-CN.json
+│       │   └── internal/
+│       │       └── message1/
+│       │           ├── en-US.yaml
+│       │           ├── zh-CN.yaml
+│       │           └── km-KH.yaml
+│       ├── example2/ # Example and test code for JSON-based internationalization
+│       │   ├── example2_test.go
+│       │   └── internal/
+│       │       └── message2/
+│       │           ├── trans.en-US.json
+│       │           └── trans.zh-CN.json
+│       └── example3/ # Example and test code for 【chinese-first】 internationalization
+│           ├── example3_test.go
+│           └── internal/
+│               └── message3/
+│                   ├── msg.en-US.yaml
+│                   └── msg.zh-CN.yaml
 ```
 
-See [generate logic for example1](internal/examples/example1/example1message/i18n.gen_test.go) and [usage examples for example1](internal/examples/example1/example1_test.go).  
 
-See [generate logic for example2](internal/examples/example2/example2message/i18n.gen_test.go) and [usage examples for example2](internal/examples/example2/example2_test.go).
+- See [generate logic for example1](internal/examples/example1/internal/message1/i18n.gen_test.go) and [usage examples for example1](internal/examples/example1/example1_test.go).
+- See [generate logic for example2](internal/examples/example2/internal/message2/i18n.gen_test.go) and [usage examples for example2](internal/examples/example2/example2_test.go).
+- See [generate logic for example3](internal/examples/example3/internal/message3/i18n.gen_test.go) and [usage examples for example3](internal/examples/example3/example3_test.go).
 
 ## Testing
 

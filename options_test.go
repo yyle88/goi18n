@@ -17,14 +17,14 @@ func TestNewOptions(t *testing.T) {
 	options := goi18n.NewOptions().WithOutputPathWithPkgName(runtestpath.SrcPath(t))
 	t.Log(neatjsons.S(options))
 
-	require.Equal(t, "goi18n", options.PkgName)
+	require.Equal(t, "goi18n", options.GetPkgName())
 }
 
 func TestOptions_WithOutputPath(t *testing.T) {
 	options := goi18n.NewOptions().WithOutputPath(runpath.PARENT.Join("/output/message.go"))
 	t.Log(neatjsons.S(options))
 
-	muststrings.HasSuffix(options.OutputPath, "goi18n/output/message.go")
+	muststrings.HasSuffix(options.GetOutputPath(), "goi18n/output/message.go")
 }
 
 func TestOptions_WithPkgName(t *testing.T) {
@@ -35,5 +35,5 @@ func TestOptions_WithPkgName(t *testing.T) {
 	options.WithOutputPath(path).WithPkgName(pkgName)
 
 	t.Log(neatjsons.S(options))
-	require.Equal(t, "goi18n", options.PkgName)
+	require.Equal(t, "goi18n", options.GetPkgName())
 }

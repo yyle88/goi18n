@@ -1,7 +1,6 @@
 package goi18n
 
 import (
-	"os"
 	"regexp"
 
 	"github.com/emirpasic/gods/v2/maps/linkedhashmap"
@@ -13,9 +12,7 @@ import (
 	"github.com/yyle88/must"
 	"github.com/yyle88/must/mustslice"
 	"github.com/yyle88/neatjson/neatjsons"
-	"github.com/yyle88/osexistpath/osmustexist"
 	"github.com/yyle88/printgo"
-	"github.com/yyle88/rese"
 	"github.com/yyle88/sortslice"
 	"github.com/yyle88/syntaxgo/syntaxgo_ast"
 	"github.com/yyle88/tern"
@@ -33,7 +30,7 @@ func Generate(messageFiles []*i18n.MessageFile, options *Options) {
 	contentBytes := CreateMessageFunctions(messageParams, options)
 	zaplog.SUG.Debugln(string(contentBytes))
 
-	if options.OutputPath != "" && options.PkgName != "" {
+	if options.outputPath != "" && options.pkgName != "" {
 		WriteContentToCodeFile(contentBytes, options)
 	} else {
 		zaplog.SUG.Debugln("NOT write-content-to-code-file RETURN")
@@ -160,19 +157,29 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam, options *
 	must.Nice(messageName)
 
 	if messageParam.Param.HasOneAnonymous {
-		ptx.Println("func New"+messageName+"[Value comparable](value Value)", "(string, Value) {")
-		ptx.Println("\treturn", `"`+messageParam.MessageID+`"`, ",", "value")
-		ptx.Println("}")
-		ptx.Println()
+		if options.generateNewMessage {
+			ptx.Println("func New"+messageName+"[Value comparable](value Value)", "(string, Value) {")
+			ptx.Println("\treturn", `"`+messageParam.MessageID+`"`, ",", "value")
+			ptx.Println("}")
+			ptx.Println()
+		}
 
 		ptx.Print("func I18n" + messageName + "[Value comparable](value Value,")
 		if messageParam.Param.NeedPluralCount {
 			ptx.Print("pluralConfig *goi18n.PluralConfig,")
 		}
 		ptx.Println(")", "*i18n.LocalizeConfig {")
+
+		if options.generateNewMessage {
+			ptx.Println("messageID, tempValue := New" + messageName + "(value)")
+		} else {
+			ptx.Println("const messageID =", `"`+messageParam.MessageID+`"`)
+			ptx.Println("var tempValue = value")
+		}
+
 		ptx.Println("\treturn &i18n.LocalizeConfig{")
-		ptx.Println("\t\tMessageID:", `"`+messageParam.MessageID+`"`, ",")
-		ptx.Println("\t\tTemplateData: value", ",")
+		ptx.Println("\t\tMessageID: messageID", ",")
+		ptx.Println("\t\tTemplateData: tempValue", ",")
 		if messageParam.Param.NeedPluralCount {
 			ptx.Println("\t\tPluralCount: pluralConfig.PluralCount,")
 		}
@@ -219,37 +226,56 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam, options *
 		ptx.Println("}")
 		ptx.Println()
 
-		ptx.Println("func New"+messageName+"(data *", structName, ")", "(string, map[string]any) {")
-		ptx.Println("\treturn", `"`+messageParam.MessageID+`"`, ",", "data.", methodName, "()")
-		ptx.Println("}")
-		ptx.Println()
+		if options.generateNewMessage {
+			ptx.Println("func New"+messageName+"(data *", structName, ")", "(string, map[string]any) {")
+			ptx.Println("\treturn", `"`+messageParam.MessageID+`"`, ",", "data.", methodName, "()")
+			ptx.Println("}")
+			ptx.Println()
+		}
 
 		ptx.Print("func I18n"+messageName+"(data *", structName, ",")
 		if messageParam.Param.NeedPluralCount {
 			ptx.Print("pluralConfig *goi18n.PluralConfig,")
 		}
 		ptx.Println(")", "*i18n.LocalizeConfig {")
+
+		if options.generateNewMessage {
+			ptx.Println("messageID, valuesMap := New" + messageName + "(data)")
+		} else {
+			ptx.Println("const messageID =", `"`+messageParam.MessageID+`"`)
+			ptx.Println("var valuesMap = data.", methodName, "()")
+		}
+
 		ptx.Println("\treturn &i18n.LocalizeConfig{")
-		ptx.Println("\t\tMessageID:", `"`+messageParam.MessageID+`"`, ",")
-		ptx.Println("\t\tTemplateData:", "data.", methodName, "()", ",")
+		ptx.Println("\t\tMessageID: messageID", ",")
+		ptx.Println("\t\tTemplateData: valuesMap", ",")
 		if messageParam.Param.NeedPluralCount {
 			ptx.Println("\t\tPluralCount: pluralConfig.PluralCount,")
 		}
 		ptx.Println("\t}")
 		ptx.Println("}")
 	} else {
-		ptx.Println("func New"+messageName+"()", "string {")
-		ptx.Println("\treturn", `"`+messageParam.MessageID+`"`)
-		ptx.Println("}")
-		ptx.Println()
+		if options.generateNewMessage {
+			ptx.Println("func New"+messageName+"()", "string {")
+			ptx.Println("\treturn", `"`+messageParam.MessageID+`"`)
+			ptx.Println("}")
+			ptx.Println()
+		}
 
 		ptx.Print("func I18n" + messageName + "(")
 		if messageParam.Param.NeedPluralCount {
 			ptx.Print("pluralConfig *goi18n.PluralConfig,")
 		}
 		ptx.Println(")", "*i18n.LocalizeConfig {")
+
+		if options.generateNewMessage {
+			ptx.Println("messageID := New" + messageName + "()")
+		} else {
+			ptx.Println("const messageID =", `"`+messageParam.MessageID+`"`)
+		}
+
 		ptx.Println("\treturn &i18n.LocalizeConfig{")
-		ptx.Println("\t\tMessageID:", `"`+messageParam.MessageID+`"`, ",")
+		ptx.Println("\t\tMessageID: messageID", ",")
 		if messageParam.Param.NeedPluralCount {
 			ptx.Println("\t\tPluralCount: pluralConfig.PluralCount,")
 		}
@@ -260,7 +286,7 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam, options *
 
 func WriteContentToCodeFile(contentBytes []byte, options *Options) {
 	ptx := printgo.NewPTX()
-	ptx.Println("package", must.Nice(options.PkgName))
+	ptx.Println("package", must.Nice(options.pkgName))
 	ptx.Println()
 	ptx.Write(contentBytes)
 	ptx.Println()
@@ -278,11 +304,7 @@ func WriteContentToCodeFile(contentBytes []byte, options *Options) {
 	contentBytes, _ = formatgo.FormatBytes(contentBytes)
 	must.Have(contentBytes)
 
-	path := must.Nice(options.OutputPath)
+	path := must.Nice(options.outputPath)
 
-	var perm os.FileMode = 0666 // default file-mode-perm
-	if osmustexist.IsFile(path) {
-		perm = rese.V1(os.Stat(path)).Mode()
-	}
-	must.Done(os.WriteFile(path, contentBytes, perm))
+	utils.RewriteFileKeepMode(path, contentBytes)
 }

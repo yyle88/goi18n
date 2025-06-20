@@ -1,4 +1,4 @@
-package message2
+package message2v2
 
 import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -17,12 +17,9 @@ func (p *ActiveUsersParam) GetTemplateValues() map[string]any {
 	return res
 }
 
-func NewActiveUsers(data *ActiveUsersParam) (string, map[string]any) {
-	return "ACTIVE_USERS", data.GetTemplateValues()
-}
-
 func I18nActiveUsers(data *ActiveUsersParam, pluralConfig *goi18n.PluralConfig) *i18n.LocalizeConfig {
-	messageID, valuesMap := NewActiveUsers(data)
+	const messageID = "ACTIVE_USERS"
+	var valuesMap = data.GetTemplateValues()
 	return &i18n.LocalizeConfig{
 		MessageID:    messageID,
 		TemplateData: valuesMap,
@@ -42,12 +39,9 @@ func (p *CompletedTasksParam) GetTemplateValues() map[string]any {
 	return res
 }
 
-func NewCompletedTasks(data *CompletedTasksParam) (string, map[string]any) {
-	return "COMPLETED_TASKS", data.GetTemplateValues()
-}
-
 func I18nCompletedTasks(data *CompletedTasksParam, pluralConfig *goi18n.PluralConfig) *i18n.LocalizeConfig {
-	messageID, valuesMap := NewCompletedTasks(data)
+	const messageID = "COMPLETED_TASKS"
+	var valuesMap = data.GetTemplateValues()
 	return &i18n.LocalizeConfig{
 		MessageID:    messageID,
 		TemplateData: valuesMap,
@@ -67,12 +61,9 @@ func (p *OpenIssuesParam) GetTemplateValues() map[string]any {
 	return res
 }
 
-func NewOpenIssues(data *OpenIssuesParam) (string, map[string]any) {
-	return "OPEN_ISSUES", data.GetTemplateValues()
-}
-
 func I18nOpenIssues(data *OpenIssuesParam, pluralConfig *goi18n.PluralConfig) *i18n.LocalizeConfig {
-	messageID, valuesMap := NewOpenIssues(data)
+	const messageID = "OPEN_ISSUES"
+	var valuesMap = data.GetTemplateValues()
 	return &i18n.LocalizeConfig{
 		MessageID:    messageID,
 		TemplateData: valuesMap,
@@ -80,12 +71,9 @@ func I18nOpenIssues(data *OpenIssuesParam, pluralConfig *goi18n.PluralConfig) *i
 	}
 }
 
-func NewPendingReviews[Value comparable](value Value) (string, Value) {
-	return "PENDING_REVIEWS", value
-}
-
 func I18nPendingReviews[Value comparable](value Value, pluralConfig *goi18n.PluralConfig) *i18n.LocalizeConfig {
-	messageID, tempValue := NewPendingReviews(value)
+	const messageID = "PENDING_REVIEWS"
+	var tempValue = value
 	return &i18n.LocalizeConfig{
 		MessageID:    messageID,
 		TemplateData: tempValue,

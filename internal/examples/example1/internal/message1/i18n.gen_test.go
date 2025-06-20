@@ -16,7 +16,9 @@ func TestGenerate(t *testing.T) {
 	zaplog.SUG.Debugln(neatjsons.S(bundle.LanguageTags()))
 
 	outputPath := osmustexist.FILE(runtestpath.SrcPath(t))
-	options := goi18n.NewOptions().WithOutputPathWithPkgName(outputPath)
+	options := goi18n.NewOptions().
+		WithOutputPathWithPkgName(outputPath).
+		WithGenerateNewMessage(true)
 	t.Log(neatjsons.S(options))
 	goi18n.Generate(messageFiles, options)
 }

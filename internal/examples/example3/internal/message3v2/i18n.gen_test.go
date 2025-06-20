@@ -1,4 +1,4 @@
-package message3_test
+package message3v2_test
 
 import (
 	"testing"
@@ -18,7 +18,6 @@ func TestGenerate(t *testing.T) {
 	outputPath := osmustexist.FILE(runtestpath.SrcPath(t))
 	options := goi18n.NewOptions().
 		WithOutputPathWithPkgName(outputPath).
-		WithGenerateNewMessage(true).
 		WithAllowNonAsciiRune(true)
 	t.Log(neatjsons.S(options))
 	goi18n.Generate(messageFiles, options)

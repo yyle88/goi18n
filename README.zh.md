@@ -158,7 +158,7 @@ goi18n/
 - 匿名参数：`I18nPleaseConfirm`
 - 无参数：`I18nWelcome`、`I18nSuccess`
 
-## 许可
+## 许可证类型
 
 项目采用 MIT 许可证，详情请参阅 [LICENSE](LICENSE)。
 

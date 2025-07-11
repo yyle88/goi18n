@@ -1,12 +1,7 @@
 package utils
 
 import (
-	"os"
 	"unicode"
-
-	"github.com/yyle88/must"
-	"github.com/yyle88/osexistpath/osmustexist"
-	"github.com/yyle88/rese"
 )
 
 func HasNonASCII(s string) bool {
@@ -53,12 +48,4 @@ func DefaultUnicodeFieldName(paramName string) string {
 		return CapitalizeFirst(s)
 	}
 	return "V" + s
-}
-
-func RewriteFileKeepMode(path string, contentBytes []byte) {
-	var perm os.FileMode = 0666 // default file-mode-perm
-	if osmustexist.IsFile(path) {
-		perm = rese.V1(os.Stat(path)).Mode()
-	}
-	must.Done(os.WriteFile(path, contentBytes, perm))
 }

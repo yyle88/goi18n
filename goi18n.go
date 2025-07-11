@@ -1,6 +1,7 @@
 package goi18n
 
 import (
+	"os"
 	"regexp"
 
 	"github.com/emirpasic/gods/v2/maps/linkedhashmap"
@@ -27,11 +28,11 @@ func Generate(messageFiles []*i18n.MessageFile, options *Options) {
 	messageParams := SortMessageParams(mapParams)
 	zaplog.SUG.Debugln(neatjsons.S(messageParams))
 
-	contentBytes := CreateMessageFunctions(messageParams, options)
-	zaplog.SUG.Debugln(string(contentBytes))
+	srcCode := CreateMessageFunctions(messageParams, options)
+	zaplog.SUG.Debugln(string(srcCode))
 
 	if options.outputPath != "" && options.pkgName != "" {
-		WriteContentToCodeFile(contentBytes, options)
+		WriteContentToCodeFile(srcCode, options)
 	} else {
 		zaplog.SUG.Debugln("NOT write-content-to-code-file RETURN")
 	}
@@ -284,27 +285,29 @@ func writeNewMsgFunction(ptx *printgo.PTX, messageParam *MessageParam, options *
 	}
 }
 
-func WriteContentToCodeFile(contentBytes []byte, options *Options) {
+func WriteContentToCodeFile(srcCode []byte, options *Options) {
 	ptx := printgo.NewPTX()
 	ptx.Println("package", must.Nice(options.pkgName))
 	ptx.Println()
-	ptx.Write(contentBytes)
+	ptx.Write(srcCode)
 	ptx.Println()
 
-	contentBytes = ptx.Bytes()
-	zaplog.SUG.Debugln(string(contentBytes))
+	srcCode = ptx.Bytes()
+	zaplog.SUG.Debugln(string(srcCode))
 
 	//把要引用的包写到代码的 import 里面（这样能提高format的速度，否则 format 还得找包，就会很慢，而且也未必能找到引用，因此这里主动设置引用）
 	importOptions := syntaxgo_ast.NewPackageImportOptions()
 	importOptions.SetInferredObject(&i18n.Message{})
 	importOptions.SetInferredObject(&MessageParam{})
-	contentBytes = importOptions.InjectImports(contentBytes)
+	srcCode = importOptions.InjectImports(srcCode)
 
 	//调整代码格式和风格。注意：这里即使出错也能返回原来的代码，而且内部已有 warn 级别的日志，因此直接忽略错误
-	contentBytes, _ = formatgo.FormatBytes(contentBytes)
-	must.Have(contentBytes)
+	srcCode, _ = formatgo.FormatBytes(srcCode)
+	//前面不判断是否有错，只需要判断结果有没有内容，格式化出错也不影响结果
+	must.Have(srcCode)
 
 	path := must.Nice(options.outputPath)
 
-	utils.RewriteFileKeepMode(path, contentBytes)
+	// when file exist WriteFile truncates it before writing, without changing permissions.
+	must.Done(os.WriteFile(path, srcCode, 0666))
 }

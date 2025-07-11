@@ -199,9 +199,11 @@ If you find this package valuable, give me some stars on GitHub! Thank you!!!
 
 **Thank you for your support!**
 
-**Happy Coding with `goi18n`!** 🎉
+**Happy Coding with this package!** 🎉
 
 Give me stars. Thank you!!!
+
+---
 
 ## GitHub Stars
 

@@ -13,12 +13,23 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// TestGenerate tests basic code generation with mixed message patterns
+// Includes messages with named params, without params, and anonymous params
+// Uses both English and Chinese message files with YAML format
+//
+// TestGenerate 测试包含多种消息模式的基本代码生成
+// 包括带命名参数、无参数和匿名参数的消息
+// 使用 YAML 格式的英文和中文消息文件
 func TestGenerate(t *testing.T) {
+	// Create i18n bundle with American English as base language
+	// 创建以美式英语为基础语言的 i18n 包
 	bundle := i18n.NewBundle(language.AmericanEnglish)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
 	var messageFiles []*i18n.MessageFile
 	{
+		// Parse English message file with various message patterns
+		// 解析包含各种消息模式的英文消息文件
 		messageFile := rese.P1(bundle.ParseMessageFileBytes([]byte(`
 SAY_HELLO: "Hello, {{ .name }}!"
 WELCOME: "Welcome to this app!"
@@ -33,6 +44,8 @@ PLEASE_CONFIRM: "Please confirm to {{ . }}"
 		messageFiles = append(messageFiles, messageFile)
 	}
 	{
+		// Parse Chinese message file with same message IDs as English version
+		// 解析与英文版本具有相同消息 ID 的中文消息文件
 		messageFile := rese.P1(bundle.ParseMessageFileBytes([]byte(`
 SAY_HELLO: "你好，{{.name}}！"
 WELCOME: "欢迎使用此应用！"
@@ -48,9 +61,18 @@ PLEASE_CONFIRM: "请确认{{.}}"
 	}
 	zaplog.SUG.Debugln(neatjsons.S(bundle.LanguageTags()))
 
+	// Generate type-safe Go code from message files
+	// 从消息文件生成类型安全的 Go 代码
 	goi18n.Generate(messageFiles, goi18n.NewOptions())
 }
 
+// TestGenerate_SingleValueYaml tests code generation from YAML files with simple named params
+// Messages use single template variables instead of complex multi-param patterns
+// Validates generation of param structs and support functions
+//
+// TestGenerate_SingleValueYaml 测试从 YAML 文件生成简单命名参数的代码
+// 消息使用单个模板变量而非复杂的多参数模式
+// 验证参数结构体和支持函数的生成
 func TestGenerate_SingleValueYaml(t *testing.T) {
 	bundle := i18n.NewBundle(language.AmericanEnglish)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
@@ -88,9 +110,18 @@ LOW_BALANCE: "您的余额不足。请添加资金以继续购物。"
 	}
 	zaplog.SUG.Debugln(neatjsons.S(bundle.LanguageTags()))
 
+	// Generate type-safe Go code from message files
+	// 从消息文件生成类型安全的 Go 代码
 	goi18n.Generate(messageFiles, goi18n.NewOptions())
 }
 
+// TestGenerate_PluralYaml tests code generation with CLDR plural forms from YAML files
+// Messages define both "one" and "other" forms to handle singular and plural cases
+// Demonstrates how plural messages generate functions that accept PluralCount param
+//
+// TestGenerate_PluralYaml 测试从 YAML 文件生成 CLDR 复数形式的代码
+// 消息定义"one"和"other"形式以处理单数和复数情况
+// 演示复数消息如何生成接受 PluralCount 参数的函数
 func TestGenerate_PluralYaml(t *testing.T) {
 	bundle := i18n.NewBundle(language.AmericanEnglish)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
@@ -134,9 +165,18 @@ NEW_MESSAGES:
 	}
 	zaplog.SUG.Debugln(neatjsons.S(bundle.LanguageTags()))
 
+	// Generate type-safe Go code with plural support from message files
+	// 从消息文件生成支持复数的类型安全 Go 代码
 	goi18n.Generate(messageFiles, goi18n.NewOptions())
 }
 
+// TestGenerate_SingleValueJson tests code generation from JSON format message files
+// Uses JSON instead of YAML format to demonstrate format-agnostic support
+// Validates param struct generation works consistently across formats
+//
+// TestGenerate_SingleValueJson 测试从 JSON 格式消息文件生成代码
+// 使用 JSON 而非 YAML 格式以演示格式无关的支持
+// 验证参数结构体生成在不同格式下都能正常工作
 func TestGenerate_SingleValueJson(t *testing.T) {
 	bundle := i18n.NewBundle(language.AmericanEnglish)
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
@@ -164,9 +204,18 @@ func TestGenerate_SingleValueJson(t *testing.T) {
 	}
 	zaplog.SUG.Debugln(neatjsons.S(bundle.LanguageTags()))
 
+	// Generate type-safe Go code from JSON format message files
+	// 从 JSON 格式消息文件生成类型安全的 Go 代码
 	goi18n.Generate(messageFiles, goi18n.NewOptions())
 }
 
+// TestGenerate_PluralJson tests code generation with plural forms from JSON format files
+// Combines JSON format with CLDR plural rules to handle one and other cases
+// Ensures plural support works consistently in JSON as it does in YAML
+//
+// TestGenerate_PluralJson 测试从 JSON 格式文件生成复数形式的代码
+// 将 JSON 格式与 CLDR 复数规则结合以处理 one 和 other 情况
+// 确保 JSON 中的复数支持与 YAML 中的工作方式一致
 func TestGenerate_PluralJson(t *testing.T) {
 	bundle := i18n.NewBundle(language.AmericanEnglish)
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
@@ -218,5 +267,7 @@ func TestGenerate_PluralJson(t *testing.T) {
 	}
 	zaplog.SUG.Debugln(neatjsons.S(bundle.LanguageTags()))
 
+	// Generate type-safe Go code with plural support from JSON message files
+	// 从 JSON 消息文件生成支持复数的类型安全 Go 代码
 	goi18n.Generate(messageFiles, goi18n.NewOptions())
 }
